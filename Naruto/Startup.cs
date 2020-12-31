@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Naruto.DbContexts;
 
 namespace Naruto
@@ -33,6 +34,21 @@ namespace Naruto
             {
                 options.UseInMemoryDatabase("DB");
             });
+            
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Ninja API",
+                    Description = "An API for ninjas.",
+                    License = new OpenApiLicense
+                    {
+                        Name = "GNU General Public License v3.0",
+                        Url = new Uri("https://www.gnu.org/licenses/gpl-3.0.en.html"),
+                    }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +66,15 @@ namespace Naruto
             app.UseStaticFiles();
 
             app.UseRouting();
+            
+            app.UseSwagger();
+            
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ninja API");
+                
+                c.RoutePrefix = "/api";
+            });
 
             app.UseAuthorization();
 
